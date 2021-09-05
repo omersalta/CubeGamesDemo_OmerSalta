@@ -15,30 +15,36 @@ public class Pool : Observer {
     
     // Start is called before the first frame update
     void Start() {
-        destroyOverabundantBall = true;
+        destroyOverabundantBall = false;
         CreateBalls(ballStack,poolStartBallCount);
     }
     
     public override void OnNotify(GameObject observable) {
         //PhysicalObject PutBack Notifying
+        //Debug.Log("coming observable object on OnNotify: "+observable.name );
         Ball physicalObject = observable.GetComponent<Ball>();
         if (physicalObject != null) {
             PutBackBall(physicalObject);
         }
+        observable.GetComponent<Observable>().UnRegister(FindObjectOfType<Pool>());
     }
 
     public void PutBackBall (Ball physicalObject) {
         if (destroyOverabundantBall && !(ballStack.Count < poolTotalCapacity)) {
             Destroy(physicalObject);
         }else {
+            physicalObject.transform.position = getRandomPosInPool();
             ballStack.Push(physicalObject);
         }
     }
 
     public Ball GetNextBall() {
         
+        //PrintCurrentBallStack();
         if (ballStack.Count > 0) {
-            return ballStack.Pop();
+            var ball = ballStack.Pop();
+            //Debug.Log("gettedBall name :"+ball.name);
+            return ball;
         }
         else {
             return AskForExtraBall();
@@ -61,7 +67,7 @@ public class Pool : Observer {
     private void CreateBalls (Stack<Ball> poolStack, int count) {
         for (int i = 0; i < count; i++) {
             var item = InstantiateBall();
-            item.name = "Ball_" + count;
+            item.name = "Ball_" + i;
             poolStack.Push(item);
         }
 
@@ -69,6 +75,7 @@ public class Pool : Observer {
 
     private Ball InstantiateBall() {
         var newBall = GameObject.Instantiate(ballPrefab);
+        newBall.transform.parent = transform;
         newBall.transform.position = getRandomPosInPool();
         return newBall.GetComponent<Ball>();
     }
