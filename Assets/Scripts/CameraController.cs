@@ -3,7 +3,10 @@
 public class CameraController : MonoBehaviour {
 
     private float moveSpeed = 7f;
-    private float rotSpeed = 4.0f;
+    private float RotSpeed= 4.0f;
+    private float rotSpeedH = 4.0f;
+    float rotX;
+    float rotY;
     
     void Update () {
         
@@ -16,9 +19,12 @@ public class CameraController : MonoBehaviour {
         }
         
         if ( Input.GetMouseButton(2) ) {
-            float h = rotSpeed * Input.GetAxis("Mouse X");
-            float v = rotSpeed * Input.GetAxis("Mouse Y");
-            transform.Rotate(-v, h, 0);
+            
+            rotX += Input.GetAxis("Mouse X")*RotSpeed;
+            rotY += Input.GetAxis("Mouse Y") * RotSpeed;
+            rotY = Mathf.Clamp(rotY, -90f, 90f);
+            Camera.main.transform.localRotation = Quaternion.Euler(-rotY, 0f, 0f);
+            transform.rotation = Quaternion.Euler(0f, rotX, 0f);
         }
         #endregion
         

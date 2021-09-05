@@ -4,13 +4,18 @@ using UnityEngine;
 
 public class BallThrower : MonoBehaviour {
     
-    private Vector3 lastClickPos;
-    private List<Vector3> clickPosList = new List<Vector3>();
+    private Vector3 _lastClickPos;
+    private List<Vector3> _clickPosList = new List<Vector3>();
     [SerializeField] private int clickPosListCapacity;
-    public Pool ballPool;
+    private Pool _ballPool;
     
     void Start() {
-        ballPool = FindObjectOfType<Pool>();
+        _ballPool = FindObjectOfType<Pool>();
+        clickPosListCapacity = 2;
+    }
+
+    public void ChangeBallPool(Pool pool) {
+        _ballPool = pool;
     }
 
     // Update is called once per frame
@@ -24,8 +29,8 @@ public class BallThrower : MonoBehaviour {
             RaycastHit curentHit;
             
             if (Physics.Raycast(mouseRay, out curentHit)) {
-                lastClickPos = curentHit.point;
-                //Debug.Log("clickPos:"+ lastClickPos);
+                _lastClickPos = curentHit.point;
+                //Debug.Log("clickPos:"+ _lastClickPos);
                 PushClickList();
             }
         }
@@ -33,39 +38,51 @@ public class BallThrower : MonoBehaviour {
     }
 
     private void PushClickList() {
-        if (clickPosList.Count < clickPosListCapacity) {
-            clickPosList.Add(lastClickPos);
-            if (clickPosList.Count == clickPosListCapacity) {
+        if (_clickPosList.Count < clickPosListCapacity) {
+            _clickPosList.Add(_lastClickPos);
+            if (_clickPosList.Count == clickPosListCapacity) {
                 PrintClickList();
-                clickPosList.Clear();
-                
+                _clickPosList.Clear();
             }
-        }else {
-            Debug.LogWarning("list Over Capacity!!!!");
-            PrintClickList();
-            clickPosList.Clear();
         }
+        Debug.LogWarning("list Over Capacity!!!!");
+        PrintClickList();
+        _clickPosList.Clear();
     }
     
 
-    public void GetBallAndThrow() {
-        var ball = ballPool.GetNextBall();
+    public void GetBallAndThrow(ThrowParam _throwParam) {
+        var ball = _ballPool.GetNextBall();
         Vector3 kickForce = new Vector3(5, 5, 5);
-        ball.KickBall(kickForce);
+        ball.velocity = kickForce;
     }
     
     private void PrintClickList() {
         int i = 0;
-        foreach (var item in clickPosList) {
+        foreach (var item in _clickPosList) {
             
             Debug.Log(i+". "+ item);
             i++;
         }
     }
     
+}
+
+
+public struct ThrowParam
+{
+    public ThrowParam(Vector3 startPos, Vector3 endPos, float hMax, float animSpeed )
+    {
+        StartPos = startPos;
+        EndPos = endPos;
+        Hmax = hMax;
+        AnimSpeed = animSpeed;
+    }
     
-   
-    
-    
-    
+    public Vector3 StartPos { get; }
+    public Vector3 EndPos { get; }
+    public float Hmax { get; }
+    public float AnimSpeed { get; }
+
+    public override string ToString() => $"({StartPos}, {EndPos}, {Hmax}, {AnimSpeed})";
 }

@@ -9,12 +9,13 @@
       <e p="Assets" t="Include">
         <e p="Scripts" t="Include">
           <e p="Ball.cs" t="Include" />
-          <e p="BallCollector.cs" t="Include" />
           <e p="BallThrower.cs" t="Include" />
           <e p="CameraController.cs" t="Include" />
           <e p="InputState.cs" t="Include" />
           <e p="PhysicalObject.cs" t="Include" />
           <e p="Pool.cs" t="Include" />
+          <e p="UI_Manager.cs" t="Include" />
+          <e p="Utilities.cs" t="Include" />
         </e>
       </e>
       <e p="CubeGamesDemo_OmerSalta.sln" t="IncludeFlat" />

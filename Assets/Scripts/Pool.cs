@@ -3,31 +3,47 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class Pool : MonoBehaviour {
+public class Pool : Observer {
+    
     
     public GameObject ballPrefab;
     private Stack<Ball> ballStack = new Stack<Ball>();
+    [SerializeField] private int poolTotalCapacity;
     [SerializeField] private int poolStartBallCount;
     [SerializeField] private int poolExtraBallCount;
+    private bool destroyOverabundantBall;
     
     // Start is called before the first frame update
-    void Start() {  
+    void Start() {
+        destroyOverabundantBall = true;
         CreateBalls(ballStack,poolStartBallCount);
     }
+    
+    public override void OnNotify(GameObject observable) {
+        //PhysicalObject PutBack Notifying
+        Ball physicalObject = observable.GetComponent<Ball>();
+        if (physicalObject != null) {
+            PutBackBall(physicalObject);
+        }
+    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public void PutBackBall (Ball physicalObject) {
+        if (destroyOverabundantBall && !(ballStack.Count < poolTotalCapacity)) {
+            Destroy(physicalObject);
+        }else {
+            ballStack.Push(physicalObject);
+        }
     }
 
     public Ball GetNextBall() {
-        if (ballStack.Count <= 0) {
-            return AskForExtraBall();
-        }
-        else {
+        
+        if (ballStack.Count > 0) {
             return ballStack.Pop();
         }
+        else {
+            return AskForExtraBall();
+        }
+        
     }
 
     private Ball AskForExtraBall() {
@@ -37,22 +53,12 @@ public class Pool : MonoBehaviour {
             poolExtraBallCount--;
             return item;
         }else {
-            Debug.LogWarning("no more can create extra ball");
+            Debug.LogWarning("no more can create extra physicalObject");
             return null;
         }
     }
     
-    private void PrintCurrentBallStack() {
-        //this func. for observing stack with debug log 
-        int i = 0;
-        foreach (var item in ballStack) {
-            Debug.Log(i+". "+ item);
-            i++;
-        }
-    }
-
     private void CreateBalls (Stack<Ball> poolStack, int count) {
-        
         for (int i = 0; i < count; i++) {
             var item = InstantiateBall();
             item.name = "Ball_" + count;
@@ -80,6 +86,15 @@ public class Pool : MonoBehaviour {
        return new Vector3(Random.Range(x0,x1),transform.position.y,Random.Range(z0,z1));
     }
     
+    private void PrintCurrentBallStack() {
+        //this func. for observing stack with debug log 
+        Debug.Log("Pool Stack Info: ");
+        int i = 0;
+        foreach (var item in ballStack) {
+            Debug.Log(i+". "+ item);
+            i++;
+        }
+    }
     
     
 }

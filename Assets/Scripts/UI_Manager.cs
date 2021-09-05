@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BallCollector
+public class UI_Manager : MonoBehaviour
 {
     
-    void DoSomething()
-    {
-        Debug.Log("do something!");
-    }
+    slider
     
-    
+    // Start is called before the first frame update
     void Start()
     {
         
@@ -21,4 +18,5 @@ public class BallCollector
     {
         
     }
+    
 }
